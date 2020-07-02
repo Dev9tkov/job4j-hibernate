@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Все объявления</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <style>
+        .containers{
+            display: flex;
+            box-shadow: 1px 1px #888888;
+        }
+        .content {
+            display: flex;
+            width: 700px;
+        }
+        .cell-text {
+            font-size: 16px
+        }
+        .listItem {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        .section-title {
+            margin: 0 15px 18px 0;
+            text-align: center;
+        }
+        .cell-listItem {
+            font-size: 17px;
+            padding-left: 20px;
+        }
+        .block-auto {
+            width: 1000px;
+            margin: 20px auto;
+            padding: 15px 17px;
+        }
+        .box-text_2 {
+            flex-direction: column;
+            padding-left: 50px;
+        }
+        .box-listItem {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding-left: 90px;
+        }
+    </style>
+    <script>
+        $(document).ready(function () {
+            loadAllItems();
+
+            $('.brandcr').change(function () {
+                loadByBrand($('.brandcr :selected').val());
+            })
+        });
+
+        function loadLastDate() {
+            $.ajax({
+                url: "http://localhost:8080/car/lastDay",
+                type: 'POST',
+                dataType: "json",
+                xhrFields: {
+                    withCredentials: true
+                },
+                crossDomain: true
+            }).done(function (data) {
+                console.log(data)
+                loadAds(data)
+            }).fail(function (error) {
+                console.log(error)
+            });
+        }
+
+        function loadByBrand(brand) {
+            $.ajax({
+                url: "http://localhost:8080/car/findbrand",
+                type: 'POST',
+                data: JSON.stringify({"brand": brand}),
+                dataType: "json",
+                xhrFields: {
+                    withCredentials: true
+                },
+                crossDomain: true
+            }).done(function (data) {
+                console.log(data)
+                loadAds(data)
+            }).fail(function (error) {
+                console.log(error)
+            });
+        }
+
+        function loadAllItems() {
+            $.ajax({
+                url: "http://localhost:8080/car/allads",
+                type: 'POST',
+                dataType: "json",
+                contentType: 'application/json;charset=UTF-8',
+                xhrFields: {
+                    withCredentials: true
+                },
+                crossDomain: true
+            }).done(function (data) {
+                console.log(data);
+                loadAds(data);
+            }).fail(function (error) {
+                console.log(error)
+            });
+        }
+        function getContextPath() {
+            return location.pathname.substring(0, window.location.pathname.indexOf("/", 2));
+        }
+        function loadAds(data) {
+            $('.all-items .block-auto').remove();
+            for (let i = 0; i < data.length; i++) {
+                let imageName = data[i].image.name;
+                let status = data[i].status;
+                if (!status) {
+                    status = "Продан</p>";
+                } else {
+                    status = "В продаже</p>";
+                }
+                $('.all-items').append("<div class='block-auto'>"
+                    + "<div class='containers'>"
+                    + "<img src=\"" + getContextPath() + "/images/" + imageName + "\" class=\"img-rounded\" alt=\"None image\" width=\"120\" height=\"120\">"
+                    + "<input hidden id='car-index' value='" + data[i].car.id + "'>"
+                    + "<div class='block-description' style='width: 600px'>"
+                    + "<h3 class='section-title'>" + data[i].car.brand.name + "</h3>"
+                    + "<div class='box-item' style='padding-left: 25px'>"
+                    + "<div class='content'>"
+                    + "<div class='block-text' style='display: flex'>"
+                    + "<div class='box-text_1' style='flex-direction: column'>"
+                    + "<div class='listItem'>"
+                    + "<label class='cell-text'>Мощность, л.с:</label>"
+                    + "<p class='cell-listItem'>" + data[i].car.engine.power + "</p>"
+                    + "</div>"
+                    + "<div class='listItem'>"
+                    + "<label class='cell-text'>Тип двигателя:</label>"
+                    + "<p class='cell-listItem'>" + data[i].car.engine.type + "</p>"
+                    + "</div>"
+                    + "<div class='listItem'>"
+                    + "<label class='cell-text'>Тип кузова:</label>"
+                    + "<p class='cell-listItem'>" + data[i].car.bodyCar + "</p>"
+                    + "</div>"
+                    + "</div>"
+                    + "<div class='box-text_2'>"
+                    + "<div class='listItem'>"
+                    + "<label class='cell-text'>Трансмиссия:</label>"
+                    + "<p class='cell-listItem'>" + data[i].car.transmission + "</p>"
+                    + "</div>"
+                    + "<div class='listItem'>"
+                    + "<label class='cell-text'>Статус:</label>"
+                    + "<p class='cell-listItem'>" + status + "</p>"
+                    + "</div>"
+                    + "</div>"
+                    + "</div>"
+                    + "<div class='box-listItem'>"
+                    + "<div class='listItem'>"
+                    + "<label class='cell-text'>Цена:</label>"
+                    + "<p class='cell-listItem'>" + data[i].price + "</p>"
+                    + "</div>"
+                    + "<div class='listItem'>"
+                    + "<label class='cell-text'>Год выпуска:</label>"
+                    + "<p class='cell-listItem'>" + data[i].car.year + "</p>"
+                    + "</div>"
+                    + "<div class='listItem'>"
+                    + "<label class='cell-text'>Пробег:</label>"
+                    + "<p class='cell-listItem'>" + data[i].car.mileAge + "</p>"
+                    + "</div>"
+                    + "</div>"
+                    + "</div>"
+                    + "</div>"
+                    + "</div>"
+                    + " </div>"
+                    + "</div>").off()
+                    .on('click', '.block-auto', function () {
+                        let indexCar = $(this).find('#car-index').val();
+                        localStorage.clear();
+                        localStorage.setItem("car", JSON.stringify(indexCar));
+                        window.location.href = "./carpage.html";
+                    });
+            }
+        }
+    </script>
+</head>
+<body>
+<h3 class="title-body-sing-up" style="text-align: center">Список объявлений машин</h3>
+<div style="display: flex; justify-content: center">
+    <div id="last">
+        <a class="btn btn-link" role="button" onclick="loadLastDate()">Показать за последий день</a>
+    </div>
+    <div id="but" style="margin: 0 10px">
+        <a href="http://localhost:63342/job4j_hibernate/src/main/webapp/add.html" class="btn btn-link" role="button">Добавить новое</a>
+    </div>
+    <div id="all" style="margin-right: 10px">
+        <a class="btn btn-link" role="button" onclick="loadAllItems()">Все</a>
+    </div>
+    <div class='dropdown' style="margin-top: 5px">
+        <select class="brandcr">
+            <option hidden value=''>Поиск по Бренду</option>
+            <option value='Audi'>Audi</option>
+            <option value='BMW'>BMW</option>
+            <option value='Chevrolet'>Chevrolet</option>
+            <option value='Ford'>Ford</option>
+            <option value='Honda'>Honda</option>
+            <option value='Mazda'>Mazda</option>
+            <option value='Volkswagen'>Volkswagen</option>
+            <option value='Lada'>Lada</option>
+        </select>
+    </div>
+</div>
+<div class="all-items">
+</div>
+</body>
+</html>

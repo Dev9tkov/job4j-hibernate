@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Добавить объявление</title>
+</head>
+<body>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#saveAd').click(function () {
+                createAd()
+            });
+        });
+        function createAd() {
+            let transmission = $('#transmission :selected').val();
+            let carBody = $('#car-body :selected').val();
+            let engineType = $('#engine :selected').val();
+            let year = $('#year').val();
+            let brand = $('#brand').val();
+            let km = $('#km').val();
+            let price = $('#price').val();
+            let power = $('#power').val();
+
+            let formData = new FormData();
+            formData.append("transmission", transmission);
+            formData.append("carBody", carBody);
+            formData.append("engineType", engineType);
+            formData.append("year", year);
+            formData.append("brand", brand);
+            formData.append("km", km);
+            formData.append("price", price);
+            formData.append("power", power);
+            formData.append("image", $("#image").get(0).files[0])
+
+            $.ajax({
+                url: "http://localhost:8080/car/savead",
+                type: 'POST',
+                data: formData,
+                enctype:"multipart/form-data",
+                cache: false,
+                processData: false,
+                contentType: false,
+                dataType: "text",
+                xhrFields: {
+                    withCredentials: true
+                },
+                crossDomain: true
+            }).done(function () {
+                window.location.href = "./mainpage.html";
+            }).fail(function (err) {
+                console.log(err);
+            });
+        }
+    </script>
+
+<div class="container" style="width: 500px">
+    <h3>Добавить объявление</h3>
+    <h4>Заполните данные: </h4>
+    <form id="advertisement-form">
+        <div class="dropdown-container">
+            <div class='dropdown'>
+                <select id='transmission' style="margin-bottom: 10px">
+                    <option hidden value=''>Коробка передач</option>
+                    <option value='Автомат'>Автомат</option>
+                    <option value='Механика'>Механика</option>
+                    <option value='Вариатор'>Вариатор</option>
+                    <option value='Робот'>Робот</option>
+                </select>
+            </div>
+            <div class='dropdown'>
+                <select id='car-body' style="margin-bottom: 10px">
+                    <option hidden value=''>Тип кузова</option>
+                    <option value='Хэтчбек'>Хэтчбек</option>
+                    <option value='Универсал'>Универсал</option>
+                    <option value='Седан'>Седан</option>
+                    <option value='Купе'>Купе</option>
+                    <option value='Кабриолет'>Кабриолет</option>
+                    <option value='Внедорожник'>Внедорожник</option>
+                    <option value='Фургон'>Фургон</option>
+                    <option value='Минивэн'>Минивэн</option>
+                    <option value='Пикап'>Пикап</option>
+                    <option value='Микроавтобус'>Микроавтобус</option>
+                </select>
+            </div>
+            <div class='dropdown' style="margin-bottom: 10px">
+                <select id='engine'>
+                    <option hidden value=''>Тип двигателя</option>
+                    <option value='Безин'>Безин</option>
+                    <option value='Дизель'>Дизель</option>
+                    <option value='Газ'>Газ</option>
+                    <option value='Гибрид'>Гибрид</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group" style="padding: 10px 0">
+            <label for="year">Год выпуска: </label>
+            <input type="text" name="year" id="year" size="10">
+        </div>
+        <div class="form-group">
+            <form id='image-form'>
+                <label for='image'>Загрузите фото:</label>
+                <input type='file' id='image' name='image'><br>
+            </form>
+        </div>
+        <div class="form-group">
+            <label for="brand">Бренд автомобиля:</label>
+            <input type="text" name="name" class="form-control" id="brand">
+        </div>
+        <div class="form-group">
+            <label for="power">Мощность, л.с.:</label>
+            <input type="text" name="power" class="form-control" id="power">
+        </div>
+        <div class="form-group">
+            <label for="km">Пробег:</label>
+            <input type="text" name="km" class="form-control" id="km">
+        </div>
+        <div class="form-group">
+            <label for="price">Цена:</label>
+            <input type="text" name="price" class="form-control" id="price">
+        </div>
+        <button type="button" id="saveAd" class="btn btn-success btn-block">Сохранить</button>
+    </form>
+</div>
+</body>
+</html>

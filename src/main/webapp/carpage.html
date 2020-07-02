@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Объявление о продаже</title>
+</head>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+<script>
+
+    var userId;//Id юзера(берем из сессии)
+    var advertUserId;//Id юзера (берем их выбранного объявления)
+    var adIndex;//Id объявления
+
+        $(document).ready(function () {
+            adIndex = JSON.parse(localStorage.getItem("car"));
+            getUserId();
+            load(adIndex);
+        });
+
+    function back() {
+        if (document.getElementById("flag-sale").checked) {
+            setSold(advertUserId);
+        } else {
+            window.location.href = "./mainpage.html";
+        }
+    }
+
+        function getUserId() {
+            $.ajax({
+                url: "http://localhost:8080/car/find",
+                method: 'GET',
+                contentType: 'application/json;charset=UTF-8',
+                xhrFields: {
+                    withCredentials: true
+                },
+                crossDomain: true,
+                dataType: 'json'
+            }).done(function (data) {
+                userId = JSON.parse(data.id);
+            }).fail(function (error) {
+                console.log(error)
+            });
+        }
+
+        function load(adIndex) {
+            $.ajax({
+                url: "http://localhost:8080/car/find",
+                method: 'POST',
+                contentType: 'application/json;charset=UTF-8',
+                data: JSON.stringify({"id": adIndex}),
+                xhrFields: {
+                    withCredentials: true
+                },
+                crossDomain: true,
+                dataType: 'json'
+            }).done(function (data) {
+                console.log(data);
+                $('#mainimage').attr('src', getContextPath() + "/images/" + data.image.name);
+                $('#company').text("Бренд " + data.car.brand.name);
+                $('#made').text("Выпущена в " + data.car.year + "г");
+                $('#horse').text("Мощность, л.с. " + data.car.engine.power);
+                $('#body').text("Тип кузова " + data.car.bodyCar);
+                $('#type').text("Тип двигателя " + data.car.engine.type);
+                $('#transmition').text("Трансмиссия " + data.car.transmission);
+                $('#price').text("Цена " + data.price);
+                advertUserId = data.user.id;
+                if (!(data.status)) {
+                    $('#status').text("Продана");
+                } else {
+                    $('#status').text("В продаже");
+                }
+                if (userId !== advertUserId) {
+                    $('.box_checkbox').hide();
+                }
+            })
+        }
+
+        function getContextPath() {
+            return location.pathname.substring(0, window.location.pathname.indexOf("/", 2));
+        }
+
+        function setSold(id) {
+            $.ajax({
+                url: "http://localhost:8080/car/change",
+                type: 'POST',
+                data: JSON.stringify({"id": id}),
+                dataType: 'json',
+                xhrFields: {
+                    withCredentials: true
+                },
+                crossDomain: true,
+            }).done(function (data) {
+                console.log(data)
+                window.location.href = "./mainpage.html";
+            }).fail(function (error) {
+                console.log(error)
+            });
+        }
+    </script>
+<body>
+<body>
+<br>
+<div class="container">
+    <div class="row">
+        <div class="col-sm-9">
+            <div class="btn-group" id="back-home">
+                <button type="button" class="btn btn-primary" onclick="back()">Назад к списку объявлений</button>
+            </div>
+        </div>
+    </div>
+</div>
+<br>
+<div class="container">
+    <div class="row">
+        <div class="col-sm-4">
+            <br>
+            <div class="row" id="company"></div>
+            <br>
+            <div class="row" id="made"></div>
+            <br>
+            <div class="row" id="body"></div>
+            <br>
+            <div class="row" id="horse"></div>
+            <br>
+            <div class="row" id="type"></div>
+            <br>
+            <div class="row" id="transmition"></div>
+            <br>
+            <div class="row" id="price"></div>
+            <br>
+            <div class="row" id="status"></div>
+            <br>
+            <div class="box_checkbox">
+                <input type="checkbox" id="flag-sale"/>
+                <label for="flag-sale" class="label_sale">Отметить как продан</label>
+            </div>
+        </div>
+        <div class="col-sm-6">
+            <img src="" id="mainimage" alt="none image" width="400" height="400">
+        </div>
+    </div>
+    <div class="row" id="setsell"></div>
+
+</div>
+</body>
+</html>
